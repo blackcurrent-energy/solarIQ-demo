@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SolarIQ — Smart Solar Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy:      #091233;
+      --navy-mid:  #1A2B6B;
+      --green:     #3DAE2B;
+      --orange:    #F5A623;
+      --white:     #FFFFFF;
+      --w70:       rgba(255,255,255,0.70);
+      --w40:       rgba(255,255,255,0.40);
+      --w10:       rgba(255,255,255,0.08);
+    }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: var(--navy);
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      color: var(--white);
+    }
+
+    /* ── stage ── */
+    .stage {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+    }
+
+    /* ── slides ── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.75s ease-in-out;
+      overflow: hidden;
+    }
+    .slide.active { opacity: 1; }
+
+    /* ── shared dot-grid texture ── */
+    .dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── left text pane (slides 2–7) ── */
+    .pane {
+      position: absolute;
+      left: 0; top: 0;
+      width: 900px;
+      height: 1080px;
+      padding: 90px 80px 90px 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(to right, #091233 68%, rgba(9,18,51,0) 100%);
+      z-index: 2;
+    }
+
+    /* ── screenshot frame ── */
+    .frame {
+      position: absolute;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1040px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px var(--w10),
+        0 30px 80px rgba(0,0,0,0.55),
+        0 0 120px rgba(26,43,107,0.35);
+      z-index: 1;
+      background: #0b1440;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── typography ── */
+    .logo      { height: 54px; width: auto; align-self: flex-start; margin-bottom: 44px; }
+    .headline  { font-size: 86px; font-weight: 800; line-height: 1.02; letter-spacing: -2px; color: var(--white); margin-bottom: 18px; }
+    .hl-green  { color: var(--green); }
+    .hl-orange { color: var(--orange); }
+    .subhead   { font-size: 36px; font-weight: 300; line-height: 1.45; color: var(--w70); max-width: 620px; margin-bottom: 38px; }
+
+    .stat { display: flex; align-items: baseline; gap: 12px; margin-top: 12px; }
+    .stat-n { font-size: 70px; font-weight: 900; color: var(--orange); line-height: 1; }
+    .stat-l { font-size: 26px; font-weight: 400; color: var(--w70); max-width: 260px; line-height: 1.3; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 14px;
+      background: rgba(61,174,43,0.12);
+      border: 1.5px solid rgba(61,174,43,0.38);
+      border-radius: 50px;
+      padding: 14px 30px;
+      font-size: 28px; font-weight: 600; color: var(--green);
+      width: fit-content; margin-bottom: 28px;
+    }
+    .badge-subtle {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 22px; font-weight: 400; color: rgba(61,174,43,0.65);
+      margin-top: 28px;
+    }
+    .badge-subtle .check { font-size: 20px; }
+    .badge .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.5; transform:scale(1.4); }
+    }
+
+    /* ── accent bar on pane left edge ── */
+    .pane::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 15%; bottom: 15%;
+      width: 4px;
+      background: linear-gradient(to bottom, transparent, var(--green) 40%, var(--green) 60%, transparent);
+      border-radius: 2px;
+    }
+
+    /* ════════════════════════════
+       SLIDE 1 — HERO
+    ════════════════════════════ */
+    #s1 {
+      background: linear-gradient(160deg, #0F1D5C 0%, var(--navy) 60%);
+    }
+    #s1 .hero-bg {
+      position: absolute; inset: 0;
+      background: url('../assets/shutterstock_1992595406[57].jpg') center/cover no-repeat;
+      opacity: 0.18;
+      z-index: 0;
+    }
+    #s1 .hero-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(9,18,51,1) 50%, rgba(9,18,51,0.4) 100%);
+      z-index: 1;
+    }
+    #s1 .hero-content {
+      position: absolute;
+      left: 110px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 3; max-width: 880px;
+    }
+    #s1 .hero-logo  { height: 88px; width: auto; margin-bottom: 52px; }
+    #s1 .hero-tag   {
+      display: inline-block;
+      background: var(--orange); color: var(--navy);
+      font-size: 20px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 10px 24px; border-radius: 4px;
+      margin-bottom: 34px;
+    }
+    #s1 .hero-h1    { font-size: 112px; font-weight: 900; line-height: 1.0; letter-spacing: -3px; margin-bottom: 12px; }
+    #s1 .hero-h2    { font-size: 112px; font-weight: 900; line-height: 1.0; letter-spacing: -3px; color: var(--green); margin-bottom: 40px; }
+    #s1 .hero-body  { font-size: 36px; font-weight: 300; color: var(--w70); line-height: 1.6; }
+
+    #s1 .partner-strip {
+      position: absolute;
+      bottom: 56px; right: 80px;
+      display: flex; align-items: center; gap: 36px;
+      z-index: 3; opacity: 0.55;
+    }
+    #s1 .partner-strip img   { height: 34px; }
+    #s1 .partner-strip .sep  { width: 1px; height: 36px; background: var(--w40); }
+    #s1 .partner-strip span  { font-size: 20px; font-weight: 300; color: var(--w70); }
+
+    /* ════════════════════════════
+       SLIDE 8 — CLOSING
+    ════════════════════════════ */
+    #s8 {
+      background: radial-gradient(ellipse 80% 80% at 50% 50%, #1A2B6B 0%, #091233 65%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #s8 .close-wrap { text-align: center; position: relative; z-index: 2; }
+    #s8 .close-logo { height: 106px; margin-bottom: 48px; }
+    #s8 .close-h1   { font-size: 52px; font-weight: 700; color: var(--white); margin-bottom: 14px; letter-spacing: -1px; }
+    #s8 .close-h2   { font-size: 34px; font-weight: 300; color: var(--w70); margin-bottom: 56px; }
+    #s8 .close-rule { width: 72px; height: 3px; background: var(--green); margin: 0 auto 52px; border-radius: 2px; }
+    #s8 .close-partners {
+      display: flex; align-items: center; justify-content: center; gap: 60px;
+    }
+    #s8 .close-col  { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    #s8 .close-eyebrow { font-size: 16px; font-weight: 400; color: var(--w40); letter-spacing: 2.5px; text-transform: uppercase; }
+    #s8 .close-sf   { height: 48px; opacity: 0.72; }
+    #s8 .close-bc   { font-size: 28px; font-weight: 600; color: var(--w70); }
+    #s8 .close-sep  { width: 1px; height: 74px; background: rgba(255,255,255,0.12); }
+
+    /* ── sun glow, closing only ── */
+    #s8::after {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── progress bar ── */
+    .progress {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 4px;
+      background: var(--green);
+      z-index: 100;
+      animation: progress var(--slide-dur, 5s) linear infinite;
+      transform-origin: left;
+    }
+    @keyframes progress {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 1 — HERO
+  ══════════════════════════════════════════ -->
+  <div class="slide active" id="s1">
+    <div class="hero-bg"></div>
+    <div class="hero-grad"></div>
+    <div class="dots"></div>
+    <div class="hero-content">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="hero-logo">
+      <div class="hero-tag">For New Zealand Schools</div>
+      <div class="hero-h1">Smart Solar</div>
+      <div class="hero-h2">Intelligence.</div>
+      <div class="hero-body">Know what your solar is doing.<br>Every school. Every day.</div>
+    </div>
+    <div class="partner-strip">
+      <img src="../assets/sustainable-finance_logo-white[42].png" alt="Sustainable Finance">
+      <div class="sep"></div>
+      <span>Powered by Blackcurrent Flex</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 2 — PORTFOLIO
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="headline">Many Schools.<br><span class="hl-green">One Platform.</span></div>
+      <div class="subhead">Complete visibility across every site — all in one place, in real time.</div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/portfolio.png" alt="Portfolio">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 3 — ENERGY DASHBOARD
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="headline">Your Energy.<br><span class="hl-green">At a Glance.</span></div>
+      <div class="subhead">System performance — power and energy, now and historic. Understand what your solar earns and what your grid costs.</div>
+      <div class="badge-subtle">
+        <span class="check">✓</span>
+        100% Carbon Offset
+      </div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/energy_dashboard.png" alt="Energy Dashboard">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 4 — CLIMATE MANAGEMENT
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="headline">Comfortable<br><span class="hl-green">Classrooms.</span></div>
+      <div class="subhead">Control your heating and cooling across every space.</div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/climate.png" alt="Climate Management">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 5 — SMART SCHEDULING
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="headline">Charge Free.<br><span class="hl-green">Save More.</span></div>
+      <div class="subhead">Intelligent battery scheduling maximises your solar investment.</div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/schedule.png" alt="Smart Scheduling">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 6 — FORECAST FIT
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="badge">
+        <span class="dot"></span>
+        On Track
+      </div>
+      <div class="headline">Performance<br><span class="hl-green">You Can Trust.</span></div>
+      <div class="subhead">Actual vs predicted — always know if your system is delivering what it promised.</div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/forecastFit.png" alt="Forecast Fit">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 7 — STORMWATCH
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="dots"></div>
+    <div class="pane">
+      <img src="../assets/solarIQ-logo-white-green-IQ[55].png" alt="SolarIQ" class="logo">
+      <div class="headline"><span class="hl-orange">Storm</span><br>Watch.</div>
+      <div class="subhead">Prepare your battery before bad weather arrives. Your school is protected before the storm hits.</div>
+    </div>
+    <div class="frame">
+      <img src="../screenshots/stormwatch.png" alt="Stormwatch">
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SLIDE 8 — CLOSING
+  ══════════════════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="dots"></div>
+    <div class="close-wrap">
+      <img src="../assets/solarIQ-logo-colour[72].png" alt="SolarIQ" class="close-logo">
+      <div class="close-h1">Smart Solar Intelligence</div>
+      <div class="close-h2">For New Zealand Schools</div>
+      <div class="close-rule"></div>
+      <div class="close-partners">
+        <div class="close-col">
+          <span class="close-eyebrow">A Sustainable Finance product</span>
+          <img src="../assets/sustainable-finance_logo-colour[72].png" alt="Sustainable Finance" class="close-sf">
+        </div>
+        <div class="close-sep"></div>
+        <div class="close-col">
+          <span class="close-eyebrow">Powered by</span>
+          <span class="close-bc">Blackcurrent Flex</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Progress indicator -->
+<div class="progress" style="--slide-dur: 5s"></div>
+
+<script>
+  var slides = document.querySelectorAll('.slide');
+  var current = 0;
+  var DURATION = 5000;
+
+  setInterval(function () {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }, DURATION);
+</script>
+
+</body>
+</html>
